@@ -1,0 +1,36 @@
+!!!
+html
+	head
+	title= "Real time web chat"
+	meta(name='viewport', content='width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0')        
+	link(href='http://fonts.googleapis.com/css?family=Lobster', rel='stylesheet', type='text/css')
+	link(rel='stylesheet', href='/css/bootstrap.min.css')
+	script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js')
+	
+	body(style='background: #e7e7e7;font-family: Arial;')
+	#mainContainer(style='width: 360px; margin: 0px auto;')
+		#header(style='text-align: center; margin-bottom: 5px;')
+			#logo(style='font-family: \'Lobster\', cursive; color: rgb(45, 113, 151); font-size: 3em; line-height: 60px;') e-Ardi Chat
+
+		#body(style='width: 100%; height: 280px; background: #f9f9f9; color: #333; border-radius: 6px; -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .075); ;-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .075); ;box-shadow: 0 1px 2px rgba(0, 0, 0, .075); border: 1px solid #d7d7d7;')
+			article
+				header
+					div(style='border-bottom: 1px solid #d7d7d7; padding: 0px; padding-left: 20px; width: 90%;')
+						h4(style='float: left;') Sign up
+						a#login-submit.btn.btn-primary.btn-small(style='position: relative; float: right;margin-top: 10px;',href='/login') Login	
+						.clearfix
+
+				#form-container(style='padding: 10px 20px;')
+					form#backend-login(name='backend-login', action='/auth/register', method='POST')
+						#email-container(style='margin-bottom: 5px;')
+							input#name(name='name', type='text', placeholder='Your name', style='width: 310px; border: 1px solid rgb(216, 216, 216); height: 30px; font-size: 1.0em; padding-left: 5px;')
+						#email-container(style='margin-bottom: 5px;')
+							input#email(name='email', type='text', placeholder='Email address', style='width: 310px; border: 1px solid rgb(216, 216, 216); height: 30px; font-size: 1.0em; padding-left: 5px;')
+						#password-container(style='margin-bottom: 20px;')
+							input#email(name='password', type='password', placeholder='Password', style='width: 310px; border: 1px solid rgb(216, 216, 216); height: 30px; font-size: 1.0em; padding-left: 5px;')
+						#submit-button-container(style='margin: 0 auto; text-align: left;')
+							button#login-submit.btn.btn-success(type='submit', style='border: 0px; font-size: 1.1em; padding: 5px 20px; border-radius: 5px;') Go
+
+            
+
+
