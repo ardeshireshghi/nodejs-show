@@ -10,6 +10,8 @@ html
 	script(src='/socket.io/socket.io.js')
 	body(style='background: #e7e7e7;font-family: Arial;')
 	.container(style='width: 900px; min-height: 300px; margin: 0 auto; padding: 20px; background: #fff; border-radius: 5px; -webkit-border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.225); -webkit-box-shadow: 0px 4px 6px rgba(0,0,0,0.225); position: relative;')
+		.textBoxContainer
+			input#pageText(type='text', value='', placeholder='type any text here...', style='border: none; -webkit-box-shadow: none;    -webkit-appearance: none;    -moz-appearance: none;    box-shadow: none;    font-size: 30px;    line-height: 40px;    height: 50px;    width: 100%;    color: rgb(50, 192, 164);')
 		.contentContainer
 			#content(style='')
 		.controls(style='position:relative; background: #fff; padding-top: 5px;')

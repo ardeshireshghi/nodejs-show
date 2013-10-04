@@ -12,39 +12,97 @@ $(document).ready(function() {
 		
 		
 		this.bindEvents = function() {
+			var that = this;
 			var sendButton = $("#send");
+			var textBox = $('#pageText');
+			var field = $('#field');
+			
+			// Event listeners
+			field.on("change",   $.proxy(this, "onFieldChanged"));
 			sendButton.on('click',  $.proxy(this, "callServer"));
+			textBox.on('keyup', $.proxy(this, "onTextEdited"));
 			$(document).on('keyup', $.proxy(this, "callServer"));
- 
+			
+			// Server event listeners (for initial data setting)
+			this.socket.on('adminContent', function (data) {
+				if (data.content != undefined) {
+					var contentCode = data.content;
+					var content = $("#content");
+					var field = $('#field');
+					field.val(contentCode);
+					
+					(contentCode.indexOf('iframe') != -1) ? content.html(contentCode) : content.html(that.generateHTML(contentCode));
+					
+					
+				} else {
+					console.log("There is a problem:", data);
+				}
+			});
+			
+			this.socket.on('adminTextBoxUpdate', function(data) {
+				if (data.content == undefined)
+					return;
+				
+				var textBoxNewValue = data.content;
+				var textBox = $('#pageText');
+				
+				// Update value
+				textBox.val(textBoxNewValue);		
+					
+			});
+		
 		}
 		
+		this.onFieldChanged = function(e) {
+			var sendButton = $("#send");
+			sendButton.removeAttr("disabled");
+		}
 		
-	/**
-	 * Sends messages to the server
-	 */
-	this.callServer = function(e) {
-		if ( e.type == "keyup" && e.keyCode != 13)
-			return;
-		
-		var field = $('#field');
-		var contentCode = field.val();
-		
-		if (contentCode == "")
-			return;
-		
-		// Update content
-		var content = $("#content");
-		(contentCode.indexOf('iframe') != -1) ? content.html(contentCode) : content.html(this.generateHTML(contentCode));
-		
-		
-		
-		var message = { content: contentCode};
-		this.socket.emit('adminChangedContent', message);
-		field.focus();
+		/**
+		 * Sends messages to the server
+		 *
+		 * @param 	e		JS event object 
+		 */
+		this.callServer = function(e) {
+			if ( e.type == "keyup" && e.keyCode != 13)
+				return;
 			
-        
-	} 
+			var sendButton = $("#send");
+			
+			if (sendButton.attr("disabled"))
+				return;
+			
+			var field = $('#field');
+			var contentCode = field.val();
+			
+			if (contentCode == "")
+				return;
+			
+			// Update content
+			var content = $("#content");
+			(contentCode.indexOf('iframe') != -1) ? content.html(contentCode) : content.html(this.generateHTML(contentCode));
+			
+			
+			
+			var message = { content: contentCode};
+			this.socket.emit('adminChangedContent', message);
+			field.focus();
+			sendButton.attr("disabled", true);
+		} 
 		
+		
+		/**
+		 * Sends messages to the server
+		 *
+		 * @param 	e		JS event object 
+		 */
+		this.onTextEdited = function(e) {
+			var textBox = $('#pageText');
+			var message = { content: textBox.val()};
+			this.socket.emit('textBoxChanged', message);
+			
+		}
+			
 		this.generateHTML = function (data) {
 		
 			var html = ''; 
@@ -52,42 +110,14 @@ $(document).ready(function() {
 			html = "<img src='" + data + "' style='width: 100%; position: relative;' />";
 			return html;
 		}
-		
+			
 		this.initialize(options);
 	
 	}
 	
-	var options = {};
-	var myAdmin = new admin(options);
+	var settings = {serverAddress: "http://www.e-ardi.com:3700"};
+	var myAdmin = new admin(settings);
 	
-	
-	// name.on('change', bindPrivateMessageListener);
-	
-	
-	
-	// function bindPrivateMessageListener(e) {
-		// if (!name.attr('disabled')) {
-				// name.attr('disabled', true);
-				// saveName(name.val());
-		// }
-		
-		// socket.on(name.val(), function (data) {
-			// if (data.message) {
-				// var newMessage = data;
-				// messages.push(newMessage);
-				// saveToStorage(messages);
-				
-				// // Output messages, scroll down, make notification sound
-				// content.append(makeHTMLMessages(newMessage));
-				// content.mCustomScrollbar("update");
-				// content.mCustomScrollbar("scrollTo",$('.mCSB_container').height() + 200);
-				// //content.scrollTop(content.height());
-				// $.playSound('http://www.e-ardi.com/assets/notification-base.mp3');
-				
-			// } else {
-				// console.log("There is a problem:", data);
-			// }
-		// });
-	// }
+
  
 });

@@ -25,6 +25,18 @@ $(document).ready(function() {
 					console.log("There is a problem:", data);
 				}
 			});
+			
+			this.socket.on('textBoxUpdate', function(data) {
+				if (data.content == undefined)
+					return;
+				
+				var textBoxNewValue = data.content;
+				var textBox = $('#pageText');
+				
+				// Update value
+				textBox.val(textBoxNewValue);		
+					
+			});
  
 		}
 		
@@ -41,8 +53,7 @@ $(document).ready(function() {
 	
 	}
 		
-	
-	var options = {};
-	var myShow = new show(options);
+	 var settings = {serverAddress: "http://www.e-ardi.com:3700"};
+	var myShow = new show(settings);
  
 });

@@ -1,84 +1,7 @@
-// var express = require("express");
-// var app = express();
-// var port = 8800;
- 
-// app.get("/", function(req, res){
-    // res.send("Wow! This is my node!");
-// });
- 
-// app.listen(port);
-// console.log("Listening on port " + port);
-
-
-
-
-var dbUsers;
-
-
-
-// create user	
-// dbConnection.query("INSERT INTO users (email, name, password, created_at, modified_at) VALUES ('mamad@mamad.com', 'Mamad', 'pass123', 1375619235, 1375619235)", function (error, rows, fields) { 
-          // console.log("Errors: ", error, "rows:", rows, "fields:", fields);
-		  // //dbUsers = rows;
-      // });
- 
-
-//var users = {ardi:
-
-
-
-
-/* var checkAuth = function(req, res, next){
-  if(typeof(req.session.user) === 'undefined') {
-    req.session.user = { name: '', pass: '', loggedIn: false }
-  }
-
-  if (!req.session.user.loggedIn) {
-    // req.session.user.loggedIn = true should be set in the 'login' route, in $R.user.validateLogin
-    res.redirect('/login');
-  } else {
-    // if we already have a req.session.user and they are logged in, keep going
-    next();
-  }
-} */
-
-/* function checkAuth(req, res, next) {
-  if (req.session.user_id === undefined) {
-    res.send('You are not authorized to view this page');
-  } else {
-    next();
-  }
-} */
-
-// App Routes
-/* app.get('/login', function (req, res) {
-  var post = req.body;
-  if (post.user == 'ardi' && post.password == '1l0v3ard1') {
-    req.session.user_id = 1;
-    res.redirect('/chat');
-  } else {
-    res.send('Bad user/pass');
-  }
-});
-
-app.get('/logout', function (req, res) {
-  delete req.session.user_id;
-  res.redirect('/login');
-}); */      
-
-// Authenticator
-// The variables
-
-// App listening (Socket listening to app (express.js) port  
-
 
 var show = function(options) {
 	
-	// this.dbSettings = { 
-		   // user: "root", 
-		   // password: "1l0v3n1ckdata", 
-		   // database: "e_ardi"
-	// };
+	this.pageData = {};
 	
 	this.init = function(options) {
 		this.setConfig();
@@ -100,7 +23,8 @@ var show = function(options) {
 		// web root
 		this.app.use(this.express.static(__dirname + '/public'));
 		
-			
+		this.setRedis();	
+		
 		// Defines routes
 		this.setRoutes();	
 		
@@ -114,11 +38,6 @@ var show = function(options) {
 		this.port = 3700;
 	};
 	
-	// this.setDB = function() {
-		// // Set db
-		// var mysql = require("mysql"); 
-		// this.dbConnection = mysql.createConnection(this.dbSettings); 
-	// };
 	
 	this.setRoutes = function() {
 		/* this.app.get('/users', this.checkAuth, function (req, res) {
@@ -129,75 +48,98 @@ var show = function(options) {
 			res.render("show");
 		});
 		
-		this.app.get('/register', function (req, res) {
-			res.render("register");
-		});
-		
-		this.app.get('/login', function (req, res) {
-			res.render("login");
-		});
 		
 		this.app.get('/admin', function (req, res) {
 			res.render("admin");
 		});
 		
-		// this.app.get('/', function (req, res) {
-			// res.redirect("login");
-		// });
-		
-		this.app.post('/auth/register', function (req, res) {
-			res.render("page");
-		});
-		
-		this.app.post('/auth/login', function (req, res) {
-			res.render("page");
-		});
-
+	
 	};
 	
 	this.setSocketIO = function() {
-	// App listening (Socket listening to app (express.js) port  
+		// App listening (Socket listening to app (express.js) port  
 		this.io = require('socket.io').listen(this.app.listen(this.port));
+		
 		var that = this;
+		
 		this.io.sockets.on('connection', function (socket) {
-			//socket.emit('message', { message: 'welcome to the chat' });
-			socket.on('adminChangedContent', function (data) {
-				console.log("Server received new Data", data);
-				if (data.content !== undefined) 
-					that.io.sockets.emit('newContent', data);
-				
-			});
+			that.getDataFromCache(socket);
 		});
 	};
 	
-	// this.checkAuth = function() {
-		// var users		= [		
-								// {name: "ardi", pass: "123456"}, 
-								// {name: "atoos", pass: "pass123"}
-		// ];                  
-		
-		// var express = require("express");
-		// var basicAuthMessage = 'Restrict area, please identify';
-		// var basicAuth;
-		// // The function
-		// return basicAuth = express.basicAuth(function(username, password) {
-		  // for (var index in users) {
-			// if (username === users[index].name && password === users[index].pass)
-				// return true;
-		  // }
-		  
-		  // return false;
-		// }, basicAuthMessage);
-	// };
 	
-	// this.getUsers = function() {
-		// // Get users
-		// dbConnection.query('SELECT * FROM users;', function (error, rows, fields) { 
-          // this.dbUsers = rows;
-		// });
+	this.setRedis = function() {
+		  this.redis = require("redis");
+		  this.redisClient = this.redis.createClient();
+		  this.redisClient.on("error", function (err) {
+			console.log("Redis Error" + err);
+		  });
+	}
+	
+	this.getDataFromCache = function(socket) {
+		if (this.redisClient == undefined)
+			return;
 		
-		// return this.users;
-	// }
+		var that = this;	
+		var socket = socket;
+		
+		this.redisClient.get("show_content", function(err, reply) {
+		// reply is null when the key is missing
+			if (reply != null)
+				that.pageData.content = reply;
+			
+			that.redisClient.get("show_title", function(err, reply) {
+				// reply is null when the key is missing
+				if (reply != null)
+					that.pageData.title = reply;
+				
+				// All data is received now we set socket.io connection events
+				that.setSocketEvents(socket);
+			});	
+			
+			
+		});
+		
+	}
+	
+	this.setSocketEvents = function(socket) {
+		
+		var that = this;
+		
+		// Set initial content for clients and admin
+		if (this.pageData.content != undefined) {
+			
+			this.io.sockets.emit('newContent', {content: this.pageData.content});
+			this.io.sockets.emit('adminContent', {content: this.pageData.content});
+		
+		}		
+		
+		if (this.pageData.title != undefined) {	
+			this.io.sockets.emit('textBoxUpdate', {content: this.pageData.title});
+			this.io.sockets.emit('adminTextBoxUpdate', {content: this.pageData.title});
+		}
+		
+		
+		// Page content changed (update client-side)
+		socket.on('adminChangedContent', function (data) {
+			console.log("Server received new content data", data);
+			if (data.content !== undefined) {
+				that.redisClient.set("show_content", data.content);
+				that.io.sockets.emit('newContent', data);
+			}
+		});
+		
+		// Textbox changed (update client-side)
+		socket.on('textBoxChanged', function(data) {
+			console.log("Server received new textbox data", data);
+			if (data.content !== undefined) {
+				that.redisClient.set("show_title", data.content);
+				that.io.sockets.emit('textBoxUpdate', data);
+			}
+			
+		});
+	}
+	
 	
 	this.run = function(options) {
 		this.init(options);
