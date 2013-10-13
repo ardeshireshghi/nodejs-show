@@ -1,4 +1,15 @@
 
+var express = require('express');
+var basicAuth = express.basicAuth;
+var auth      = function(req, res, next) {
+  
+  basicAuth(function(user, pass, callback) {
+    callback(null, user === 'admin' && pass === '1amadm1n');
+  })(req, res, next);
+
+};
+
+
 var show = function(options) {
 	
 	this.pageData = {};
@@ -15,14 +26,6 @@ var show = function(options) {
 		this.setExpress();
 		//this.setDB();
 		
-		// Set view (template engine) to jade
-		this.app.set('views', __dirname + '/tpl');
-		this.app.set('view engine', "jade");
-		this.app.engine('jade', require('jade').__express);
-		
-		// web root
-		this.app.use(this.express.static(__dirname + '/public'));
-		
 		this.setRedis();	
 		
 		// Defines routes
@@ -36,6 +39,15 @@ var show = function(options) {
 		this.express = require("express");
 		this.app = this.express();
 		this.port = 3700;
+		
+		// Set view (template engine) to jade
+		this.app.set('views', __dirname + '/tpl');
+		this.app.set('view engine', "jade");
+		this.app.engine('jade', require('jade').__express);
+		
+		// web root
+		this.app.use(this.express.static(__dirname + '/public'));
+		
 	};
 	
 	
@@ -49,12 +61,34 @@ var show = function(options) {
 		});
 		
 		
-		this.app.get('/admin', function (req, res) {
+		this.app.get('/admin', auth, function (req, res) {
 			res.render("admin");
 		});
 		
 	
 	};
+	
+	
+	this.checkAuth = function() {
+		
+
+		
+		// var basicAuthMessage = 'Restricted area, please identify';
+		// var users		= [		
+								// {name: "admin", pass: "1amadm1n"}, 
+								
+		// ];                  
+		
+		// return basicAuth = express.basicAuth(function(username, password) {
+		  // for (var index in users) {
+			// if (username === users[index].name && password === users[index].pass)
+				// return true;
+		  // }
+		  
+		  // return false;
+		// }, basicAuthMessage);
+	}
+	
 	
 	this.setSocketIO = function() {
 		// App listening (Socket listening to app (express.js) port  
@@ -106,7 +140,9 @@ var show = function(options) {
 		
 		var that = this;
 		
+		
 		// Set initial content for clients and admin
+		
 		if (this.pageData.content != undefined) {
 			
 			this.io.sockets.emit('newContent', {content: this.pageData.content});
@@ -137,6 +173,14 @@ var show = function(options) {
 				that.io.sockets.emit('textBoxUpdate', data);
 			}
 			
+		});
+		
+		// Image share content
+		socket.on('imageDataShare', function (data) {
+			console.log("Server received image data", data);
+			if (data.content !== undefined) {
+				that.io.sockets.emit('clientImageShare', data);
+			}
 		});
 	}
 	

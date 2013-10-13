@@ -10,14 +10,35 @@ html
 	script(src='/socket.io/socket.io.js')
 	body(style='background: #e7e7e7;font-family: Arial;')
 	.container(style='width: 900px; min-height: 300px; margin: 0 auto; padding: 20px; background: #fff; border-radius: 5px; -webkit-border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.225); -webkit-box-shadow: 0px 4px 6px rgba(0,0,0,0.225); position: relative;')
-		.textBoxContainer
-			input#pageText(type='text', value='', placeholder='type any text here...', style='border: none; -webkit-box-shadow: none;    -webkit-appearance: none;    -moz-appearance: none;    box-shadow: none;    font-size: 30px;    line-height: 40px;    height: 50px;    width: 100%;    color: rgb(50, 192, 164);')
-		.contentContainer
-			#content(style='')
-		.controls(style='position:relative; background: #fff; padding-top: 5px;')
-			div(style='position: relative; margin: 0 auto; width: 570px; padding: 5px 0px;')
-				| Content URL:
-				textarea#field(style='width: 78%; padding-left: 3px; margin-left: 10px; margin-right: 1%; height: 100px; -webkit-appearance: none; resize: none;border-radius: 5px; -webkit-border-radius: 5px; border: 1px solid #d7d7d7;')
-				input#send(type='button', value='Change', style='width: 20%; cursor: pointer; border: 1px solid #eb7519; height: 30px; background: rgba(229,137,38,0.89); color: #f0f0f0; font-size: 16px; font-weight: bold; border-radius: 5px; -webkit-border-radius: 5px;margin-top: 10px;')   
-
+		.controls(style='position:relative; background: #eee; margin-bottom: 20px;border: 1px solid #e2e2e2;')
+			.tab(style="float: left;    width: 200px;    height: 100%; position: absolute; border: 1px solid #dfdfdf;    margin-right: 70px;    background: #f6f6f6;")
+				.selected
+					a(href="#",class="js-share-content-link")
+						img(src="img/share.png",style="height: 16px;")
+						span(style="margin-left: 10px;position: relative;  top: 3px;")
+							| Share Content
+				div
+					a(href="#",class="js-take-photo-link")
+						img(src="img/take-a-photo.png",style="height: 16px;")
+						span(style="margin-left: 10px;position: relative;  top: 3px;")
+						| Take and Share photo		
+			.contentEdit(style='position: relative; margin-left: 300px; float: left; width: 570px; margin-top: 20px;')
+				.contentShare
+					textarea#field(style='width: 78%; padding-left: 3px; margin-left: 10px; margin-right: 1%; height: 100px; -webkit-appearance: none; resize: none;border-radius: 5px; -webkit-border-radius: 5px; border: 1px solid #d7d7d7;font-size: 20px;color: #999;')
+					input#send(type='button', value='Share', style='margin-left: 140px;width: 30%; cursor: pointer; border: 1px solid rgb(19, 170, 140); height: 50px; font-size: 18px;background: rgb(50, 192, 164); color: #f0f0f0; font-size: 16px; font-weight: bold; border-radius: 5px; -webkit-border-radius: 5px;margin-top: 10px;')
+				.textBoxContainer(style='margin-top: 30px')
+					input#pageText(type='text', value='', placeholder='type any text here...', style='border: none; -webkit-box-shadow: none;    -webkit-appearance: none;    -moz-appearance: none;    box-shadow: none;    font-size: 30px;    line-height: 40px;    height: 50px;    width: 100%;    color: rgb(50, 192, 164);background: transparent;')
+				.contentContainer
+					#content(style='')
+					.btnControls(style="width: auto; text-align: center;")
+						button(class="btn btn-info js-btn-take-photo", style="margin-top: 10px;margin-right: 10px;outline: none;display:none;")
+							img(src="img/take-a-photo-white.png", style="height: 32px;padding: 5px 10px;")		
+						button(class="btn btn-warning js-btn-download", style="margin-top: 10px;margin-right: 10px;outline: none;display:none;")
+							img(src="img/download.png", style="height: 32px;padding: 5px 10px;")
+						button(class="btn btn-danger js-btn-cancel", style="margin-top: 10px;outline: none;display:none;")
+							img(src="img/cancel-btn.png", style="height: 32px;padding: 5px 10px;")
+			
+			.clearfix
+		
+		
 

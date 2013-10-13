@@ -19,7 +19,7 @@ $(document).ready(function() {
 					var content = $("#content");
 					
 					(contentCode.indexOf('iframe') != -1) ? content.html(contentCode) : content.html(that.generateHTML(contentCode));
-					content.append(makeHTMLMessages(newMessage));
+					//content.append(makeHTMLMessages(newMessage));
 					
 				} else {
 					console.log("There is a problem:", data);
@@ -36,6 +36,13 @@ $(document).ready(function() {
 				// Update value
 				textBox.val(textBoxNewValue);		
 					
+			});
+			
+			this.socket.on('clientImageShare', function(data) {
+				var contentCode = data.content;
+				var content = $("#content");
+				
+				content.html(that.generateHTML(contentCode));
 			});
  
 		}
