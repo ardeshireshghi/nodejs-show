@@ -2,7 +2,7 @@
 var express = require('express');
 var basicAuth = express.basicAuth;
 var auth      = function(req, res, next) {
-  
+  // Obviously this is not best practice (user info should be normaly in db, at least this is outside web root)
   basicAuth(function(user, pass, callback) {
     callback(null, user === 'admin' && pass === '1amadm1n');
   })(req, res, next);
