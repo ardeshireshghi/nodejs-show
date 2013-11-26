@@ -179,11 +179,29 @@ var show = function(options) {
 		socket.on('imageDataShare', function (data) {
 			console.log("Server received image data", data);
 			if (data.content !== undefined) {
+				
+				var imageData = data.content;
+				imageData.replace(/^data:image\/[^]{3,4};base64,/, '');
+				
+				require("fs").writeFile( that.uniqid() + ".png", imageData, 'base64', function(err) {
+				  console.log(err);
+				});
+				
 				that.io.sockets.emit('clientImageShare', data);
 			}
 		});
 	}
 	
+	this.uniqid = function (length) {
+		var length = (length == undefined) ? 13 : length;
+		var text = "";
+		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+		for( var i=0; i < length - 1; i++ )
+			text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+		return text;
+	}
 	
 	this.run = function(options) {
 		this.init(options);
